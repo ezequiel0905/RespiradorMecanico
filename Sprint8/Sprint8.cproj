@@ -126,6 +126,12 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="menu.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="menu.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="nokia5110.c">
       <SubType>compile</SubType>
     </Compile>

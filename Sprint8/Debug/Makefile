@@ -39,6 +39,7 @@ SUBDIRS :=
 C_SRCS +=  \
 ../freqRespiracao.c \
 ../main.c \
+../menu.c \
 ../nokia5110.c \
 ../usart.c
 
@@ -52,24 +53,28 @@ ASM_SRCS +=
 OBJS +=  \
 freqRespiracao.o \
 main.o \
+menu.o \
 nokia5110.o \
 usart.o
 
 OBJS_AS_ARGS +=  \
 freqRespiracao.o \
 main.o \
+menu.o \
 nokia5110.o \
 usart.o
 
 C_DEPS +=  \
 freqRespiracao.d \
 main.d \
+menu.d \
 nokia5110.d \
 usart.d
 
 C_DEPS_AS_ARGS +=  \
 freqRespiracao.d \
 main.d \
+menu.d \
 nokia5110.d \
 usart.d
 
@@ -95,6 +100,13 @@ LINKER_SCRIPT_DEP+=
 	
 
 ./main.o: .././main.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 5.4.0
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.6.364\include"  -Og -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega328p -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.6.364\gcc\dev\atmega328p" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+./menu.o: .././menu.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 5.4.0
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.6.364\include"  -Og -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega328p -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.6.364\gcc\dev\atmega328p" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
