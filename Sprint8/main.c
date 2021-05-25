@@ -12,12 +12,44 @@
 #include <stdio.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <time.h>
 #include "usart.h"
 #include "menu.h"
+#define cpl_bit(Y,bit_x) (Y^=(1<<bit_x))	//complementa bit
+#define LED PB5
 
+/*variáveis com os valores para o relógio precisam ser tratadas
+em um código adequado. Variáveis globais que são utilizadas
+dentro de interrupções e lidas fora delas devem ser declaradas
+como volatile. Isto é uma exigência para o compilador.
+Respostas imprevisíveis correrão se o comando volatile não for empregado.*/
+
+int segundos = 0, minutos = 0, horas = 0;
+
+//-----------------------------------------------------------------------------
+ISR(TIMER2_OVF_vect)		//entrada aqui a cada 1 segundo
+{							//rotina para contagem das horas, minutos e segundos
+	segundos++;
+
+	if(segundos == 60)
+	{
+		segundos = 0;
+		minutos++;
+
+		if (minutos == 60)
+		{
+			minutos = 0;
+			horas++;
+
+			if (horas == 24)
+			horas = 0;
+		}
+	}
+}	
 //PROTÓPICOS DOS MÉTODOS E FUNÇÕES
 void RespiraLeds(uint8_t *flag_disparo);
 void LeituraOT(uint8_t *flag_disparo);
+char *horaAtual();
 
 //DEFINIÇÃO DE STRUCT
 typedef struct sinaisVitais
@@ -89,7 +121,7 @@ ISR(PCINT0_vect)
     static uint8_t flagSobe = 0;
     if (flagSobe)
     {
-        if (sel < 3)
+        if (sel < 4)
             sel++;
         else
             sel = 0;
@@ -109,7 +141,7 @@ ISR(TIMER0_COMPA_vect)
     {
         flag_150ms = 1;
     }
-    if (tempo_ms % 5000)
+    if (tempo_ms % 1000)
         flag_hora = 1;
 }
 ISR(PCINT2_vect)
@@ -127,6 +159,7 @@ int main(void)
     DDRC = 0b11111100;
     DDRD = 0b10000000;  // COMO ENTRADAS menos o D0
     PORTD = 0b11111110; //HABILITANDO todos o pull-ups menos o D0
+	
 
     //Configuração das Interrupções
     EICRA = 0b00001010;  //INTERRUPÇÕES SENSÍVEIS A BORDA DE move
@@ -147,6 +180,13 @@ int main(void)
     TCCR1B = 0b00011010;
     OCR1A = 2000;
     OCR1B = 2000;
+	
+	//Configuração do Timer 2
+	ASSR  = 1<<AS2;					//habilita o cristal externo para o contador de tempo real
+	TCCR2B = (1<<CS22)|(1<<CS20);	/*prescaler = 128, freq. p/ o contador -> 32.768/128 = 256 Hz.
+									Como o contador é de 8 bits, ele conta 256 vezes, 
+									resultando em um estouro preciso a cada 1 segundo*/
+	TIMSK2 = 1<<TOIE2;  			//habilita interrupção do TC2
 
     //Configuração do ADC
     ADMUX = 0b01000000;
@@ -157,15 +197,15 @@ int main(void)
     sei(); //HABILITA INTERRUPÇÕES GLOBAIS
 
     nokia_lcd_init();
-
+	
     /* Replace with your application code */
     USART_Inicio(MYUBRR);
     while (1)
     {
-
+		
         LeituraOT(&flag_150ms);
         RespiraLeds(&flag_resp_por16);
-        MostrarNokia(&flag_200ms, sv.respPorMinuto, sv.freq_card, sv.temperatura, sv.spO2, porcentOxi, vol, sel);
+        MostrarNokia(&flag_200ms, sv.respPorMinuto, sv.freq_card, sv.temperatura, sv.spO2, porcentOxi, vol, sel, horas, minutos, segundos);
     }
 }
 
@@ -247,3 +287,4 @@ void LeituraOT(uint8_t *flag_disparo)
         *flag_disparo = 0;
     }
 }
+

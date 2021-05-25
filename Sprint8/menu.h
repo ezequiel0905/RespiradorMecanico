@@ -11,4 +11,4 @@
 #include <stdio.h> 
 #include "usart.h"
 
-void MostrarNokia(uint8_t *flag_disparo,uint8_t freq_resp,uint16_t freqcard, float temp_paciente, uint8_t ox_paciente, uint8_t oxi_paciente,uint8_t vol_resp, uint8_t sel);
+void MostrarNokia(uint8_t *flag_disparo,uint8_t freq_resp,uint16_t freqcard, float temp_paciente, uint8_t ox_paciente, uint8_t oxi_paciente,uint8_t vol_resp, uint8_t sel,int horas,int minutos,int segundos);

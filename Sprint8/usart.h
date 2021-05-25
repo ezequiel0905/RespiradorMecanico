@@ -19,8 +19,11 @@ void USART_Inicio(unsigned int ubrr);
 void USART_Emitir(unsigned char data);
 unsigned char USART_Recebe(void);
 uint8_t Check_Faixa_HHHxLLL(char *payload, int16_t *HHH,  int16_t *LLL);
+void Check_Altura(char *payload, int16_t *altura, int16_t *decimal);
 
 extern unsigned char pressao_arterial[8];
 extern int16_t pressao_H, pressao_L;
+extern unsigned char altura[4], peso[4];
+extern int16_t alturaI, alturaD;
 
 #endif

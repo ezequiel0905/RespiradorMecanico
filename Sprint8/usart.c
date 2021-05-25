@@ -9,10 +9,12 @@
 #include <stdlib.h>
 
 unsigned char pressao_arterial[8]= "HHHxLLL";
+unsigned char altura[4] = "A,AA", peso[4]= "PP,P";
+int16_t alturaI, alturaD;
 int16_t pressao_H, pressao_L;
 
 ISR(USART_RX_vect){
-	static uint8_t flag =0, index = 0;
+	static uint8_t flag =0, index = 0, indexA = 0, flagA = 0, flagP=0, indexP=0;
 	char recebido = UDR0;
 	
 	
@@ -22,23 +24,76 @@ ISR(USART_RX_vect){
 		flag = 1;
 		index = 0;
 		break;
+	case '{':
+		flagA= 1;
+		indexA = 0;
+		break;
+	case '[':
+		flagP=1;
+		indexP=0;
+		break;
 	case ':':
 		flag=0;
 		pressao_arterial[index]='\0';
 		if(Check_Faixa_HHHxLLL(pressao_arterial,&pressao_H, &pressao_L)==0)
 		strcpy(pressao_arterial,"ERRO!");
 		break;
+	case '}':
+		flagA =0;
+		altura[indexA]='\0';
+		break;
+	case ']':
+		flagP =0;
+		peso[indexP]='\0';
+		break;
 	default:
+		if (flagP)
+		{
+			if (indexP<4)
+			{
+				
+				peso[indexP++]=recebido;
+			}
+			else
+			{
+				
+				flagP=0;
+				strcpy(peso,"ERRO!");
+
+			}
+		}
 		if (flag)
 		{
 			if (index<7)
 			{
 				pressao_arterial[index++]=recebido;
+				
 			}
 			else
 			{
 				flag=0;
+				
 				strcpy(pressao_arterial,"ERRO!");
+				
+
+			}
+		}
+		if (flagA)
+		{
+			if (indexA<4)
+			{
+				
+				altura[indexA++]=recebido;
+				
+			}
+			else
+			{
+				
+				flagA = 0;
+				
+				strcpy(altura,"ERRO!");
+				
+
 			}
 		}
 	}
@@ -85,4 +140,18 @@ uint8_t Check_Faixa_HHHxLLL(char *check, int16_t *HHH, int16_t *LLL)
 	}else{
 		return 0;
 	}
+}
+void Check_Altura(char *check, int16_t *inteira, int16_t *decimal){
+	unsigned char alturaI[1], alturaD[2];
+	char *split, *aux;
+	aux = strupr(check);
+	split=strsep(&aux, ",");
+	strcpy(alturaI,split);
+	split = strsep(&aux,",");
+	strcpy(alturaD,split);
+	
+	*inteira = atoi(alturaI);
+	*decimal = atoi(alturaD);
+	
+	
 }

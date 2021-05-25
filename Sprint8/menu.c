@@ -8,8 +8,9 @@
 #include <stdio.h>
 #include "nokia5110.h"
 #include "menu.h"
+#include "usart.h"
 
-void MostrarNokia(uint8_t *flag_disparo,uint8_t freq_resp,uint16_t freqcard, float temp_paciente, uint8_t ox_paciente, uint8_t oxi_paciente,uint8_t vol_resp, uint8_t sel){
+void MostrarNokia(uint8_t *flag_disparo,uint8_t freq_resp,uint16_t freqcard, float temp_paciente, uint8_t ox_paciente, uint8_t oxi_paciente,uint8_t vol_resp, uint8_t sel, int horas,int minutos, int segundos){
 
 	unsigned char oxi_string[3];
 	unsigned char vol_string[3];
@@ -17,6 +18,10 @@ void MostrarNokia(uint8_t *flag_disparo,uint8_t freq_resp,uint16_t freqcard, flo
 	unsigned char temp_string[5];
 	unsigned char freqResp_string[3];
 	unsigned char freqCard_string[4];
+	unsigned char hora_str[9];
+	unsigned char imc_string[4];
+	float imc = atof(peso)/(atof(altura)*atof(altura));
+	//sprintf(imc_string,"%u",imc);
 	
 	if(*flag_disparo){
 
@@ -110,6 +115,31 @@ void MostrarNokia(uint8_t *flag_disparo,uint8_t freq_resp,uint16_t freqcard, flo
 			nokia_lcd_write_string(vol_string, 1);
 			nokia_lcd_set_cursor(25,35);
 			nokia_lcd_write_string("* volume",1);
+			break;
+			
+			case 4:
+			nokia_lcd_clear();
+			sprintf(hora_str,"%u:%u:%u",horas,minutos,segundos);
+			nokia_lcd_set_cursor(0,0);
+			nokia_lcd_write_string("INF. PACIENTE",1);
+			nokia_lcd_set_cursor(0,10);
+			nokia_lcd_write_string("Duracao: ",1);
+			nokia_lcd_set_cursor(48,10);
+			nokia_lcd_write_string(hora_str,1);
+			nokia_lcd_set_cursor(0,20);
+			nokia_lcd_write_string(altura,1);
+			nokia_lcd_set_cursor(25,20);
+			nokia_lcd_write_string(" m",1);
+			nokia_lcd_set_cursor(0,30);
+			nokia_lcd_write_string(peso, 1);
+			nokia_lcd_set_cursor(25,30);
+			nokia_lcd_write_string(" Kg",1);
+			sprintf(imc_string,"%u",(uint16_t)(imc*10));
+			imc_string[4]=imc_string[3];imc_string[3]=imc_string[2];imc_string[2]='.';
+			nokia_lcd_set_cursor(0,40);
+			nokia_lcd_write_string(imc_string,1);
+			nokia_lcd_set_cursor(25,40);
+			nokia_lcd_write_string(" Kg/m2",1);
 			break;
 		}
 		nokia_lcd_render();
